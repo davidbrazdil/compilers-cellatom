@@ -11,7 +11,7 @@ interpreter.o: interpreter.c AST.h
 main.o: main.c AST.h grammar.h
 
 runtime.bc: runtime.c
-	clang -c -emit-llvm runtime.c -o runtime.bc -O0
+	clang -c -emit-llvm runtime.c -o runtime.bc -lpthread -O0
 
 compiler.o: compiler.cc AST.h
 	c++ -std=c++0x `llvm-config --cxxflags` -c compiler.cc -O3 #-g -O0 -fno-inline
