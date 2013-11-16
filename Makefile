@@ -1,17 +1,18 @@
 CC=clang
-#LLVM_LIBS=analysis archive bitreader bitwriter codegen core engine executionengine instrumentation interpreter ipa ipo jit linker native nativecodegen scalaropts selectiondag support target transformutils
+#LLVM_LIBS=analysis dispatch archive bitreader bitwriter codegen core engine executionengine instrumentation interpreter ipa ipo jit linker native nativecodegen scalaropts selectiondag support target transformutils
 LLVM_LIBS=all
+EXTRA_LIBS=-ldispatch
 
 all: cellatom
 
 cellatom: interpreter.o main.o grammar.o compiler.o runtime.bc
-	c++ compiler.o interpreter.o grammar.o main.o `llvm-config --ldflags --libs ${LLVM_LIBS}` -o cellatom # -ldl
+	c++ compiler.o interpreter.o grammar.o main.o `llvm-config --ldflags --libs ${LLVM_LIBS}` ${EXTRA_LIBS} -o cellatom # -ldl
 
 interpreter.o: interpreter.c AST.h
 main.o: main.c AST.h grammar.h
 
 runtime.bc: runtime.c
-	clang -c -emit-llvm runtime.c -o runtime.bc -O0
+	clang -fblocks -c -emit-llvm runtime.c -I/usr/local/include/ -o runtime.bc -O0
 
 compiler.o: compiler.cc AST.h
 	clang `llvm-config --cxxflags` -c compiler.cc -O3 #-g -O0 -fno-inline -std=c++0x
